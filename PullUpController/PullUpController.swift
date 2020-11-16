@@ -82,7 +82,9 @@ open class PullUpController: UIViewController {
     open var pullUpControllerSkipPointVerticalVelocityThreshold: CGFloat {
         return 700
     }
-    
+    open var enablePanGesture: Bool {
+        return true
+    }
     // MARK: - Public properties
     
     /**
@@ -150,7 +152,7 @@ open class PullUpController: UIViewController {
      - parameter animated: Pass true to animate the move; otherwise, pass false.
      - parameter completion: The closure to execute after the animation is completed. This block has no return value and takes no parameters. You may specify nil for this parameter.
      */
-    open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, completion: (() -> Void)?) {
+    open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, animation:(() -> Void)? = nil, completion: (() -> Void)?) {
         guard
             isPortrait,
             let parentViewHeight = parent?.view.frame.height
@@ -161,6 +163,7 @@ open class PullUpController: UIViewController {
             action: .move,
             withDuration: animated ? 0.3 : 0,
             animations: { [weak self] in
+                animation?()
                 self?.parent?.view?.layoutIfNeeded()
             },
             completion: { [weak self] _ in
@@ -359,7 +362,7 @@ open class PullUpController: UIViewController {
     
     @objc private func handlePanGestureRecognizer(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard
-            isPortrait,
+            isPortrait, enablePanGesture, 
             let topConstraint = topConstraint
             else { return }
         
